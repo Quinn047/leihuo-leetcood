@@ -4,47 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>雷火引擎岗 | 56日算法突击</title>
+    
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
         :root { --blue: #3b82f6; --green: #22c55e; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: #f8fafc; color: #1e293b; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #1e293b; overflow-x: hidden; }
         
-        /* 玻璃拟态与阴影 */
-        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); }
         .card-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+        .nav-active { background: white; color: var(--blue); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); border-radius: 14px; }
+        .mobile-nav-active { color: var(--blue); font-weight: 800; transform: translateY(-2px); }
         
-        /* 导航激活态 */
-        .nav-active { background: white; color: var(--blue); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1); border-radius: 12px; }
-        .mobile-nav-active { color: var(--blue); transform: translateY(-2px); }
-        
-        /* 代码显示优化 */
-        code, pre { font-family: 'JetBrains Mono', monospace !important; font-size: 13px !important; line-height: 1.6; }
+        /* 核心高亮优化 */
+        code[class*="language-"], pre[class*="language-"] { 
+            font-family: 'JetBrains Mono', monospace !important; 
+            font-size: 13px !important; 
+            text-shadow: none !important;
+        }
+        pre { border-radius: 12px !important; margin: 0 !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* 移动端全屏代码遮罩 */
-        #code-fullscreen { display: none; position: fixed; inset: 0; background: #1d1d1d; z-index: 100; overflow: auto; padding: 20px; }
+        /* 适配移动端横向滚动代码 */
+        #code-preview { white-space: pre !important; overflow-x: auto !important; word-break: normal !important; word-wrap: normal !important; }
     </style>
 </head>
-<body class="pb-20 lg:pb-0">
+<body class="pb-24 lg:pb-0">
 
     <div class="flex min-h-screen">
         <aside class="hidden lg:flex flex-col w-72 bg-slate-50 border-r border-slate-200 sticky top-0 h-screen p-6">
-            <div class="mb-10">
+            <div class="mb-10 p-2">
                 <h1 class="text-2xl font-black tracking-tighter text-slate-800 italic">🔥 LEIHUO <span class="text-blue-600">ROAD</span></h1>
-                <div class="flex items-center gap-2 mt-2">
-                    <span class="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">引擎开发 56日突击计划</span>
-                </div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">网易雷火引擎岗特训</p>
             </div>
             
-            <nav id="pc-nav" class="flex-1 space-y-2 overflow-y-auto no-scrollbar font-bold text-slate-500 text-sm">
+            <nav id="pc-nav" class="flex-1 space-y-1.5 overflow-y-auto no-scrollbar font-bold text-slate-500 text-sm">
                 </nav>
 
-            <div class="mt-6 p-5 glass rounded-3xl card-shadow">
-                <div class="flex justify-between text-[11px] font-black mb-2 uppercase"><span>Total Progress</span><span id="prog-val">0%</span></div>
+            <div class="mt-6 p-5 glass rounded-[2rem] card-shadow">
+                <div class="flex justify-between text-[11px] font-black mb-2 uppercase tracking-tighter"><span>Overall Progress</span><span id="prog-val" class="text-blue-600">0%</span></div>
                 <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
                     <div id="prog-bar" class="h-full bg-blue-500 transition-all duration-1000" style="width: 0%"></div>
                 </div>
@@ -53,117 +54,78 @@
 
         <main class="flex-1 flex flex-col min-w-0">
             <header class="h-16 glass sticky top-0 z-30 px-6 lg:px-10 flex justify-between items-center border-b border-slate-200">
-                <h2 id="current-title" class="font-black text-slate-700 uppercase tracking-tight">第 1 周：数组与双指针</h2>
-                <button onclick="exportData()" class="text-xs font-black bg-slate-800 text-white px-4 py-2 rounded-xl shadow-lg hover:scale-105 transition">备份 💾</button>
+                <h2 id="current-title" class="font-black text-slate-700 uppercase tracking-tight truncate mr-4">第 1 周：基础准备</h2>
+                <div class="flex items-center gap-2">
+                    <button onclick="exportData()" class="text-[11px] font-black bg-slate-800 text-white px-4 py-2 rounded-xl shadow-lg hover:bg-slate-700 transition active:scale-95">备份 💾</button>
+                </div>
             </header>
 
-            <div id="content-area" class="p-5 lg:p-10 max-w-4xl mx-auto w-full space-y-10">
+            <div id="content-area" class="p-4 lg:p-10 max-w-4xl mx-auto w-full space-y-8">
                 </div>
         </main>
     </div>
 
-    <div class="lg:hidden fixed bottom-0 left-0 right-0 glass border-t border-slate-200 flex justify-around items-center py-3 z-40 px-2 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-        <div id="mobile-nav" class="flex gap-4 overflow-x-auto no-scrollbar w-full px-4 items-center">
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 glass border-t border-slate-200 flex items-center h-20 z-40 px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.08)]">
+        <div id="mobile-nav" class="flex gap-6 overflow-x-auto no-scrollbar w-full items-center py-2">
             </div>
     </div>
 
-    <div id="modal" class="fixed inset-0 z-50 hidden bg-slate-900/80 backdrop-blur-md p-0 lg:p-8">
-        <div class="bg-white w-full h-full lg:rounded-3xl shadow-2xl flex flex-col overflow-hidden max-w-6xl mx-auto">
+    <div id="modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-md flex items-end lg:items-center justify-center p-0 lg:p-6">
+        <div class="bg-white w-full h-[92vh] lg:h-full lg:max-h-[850px] lg:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden max-w-6xl animate-in slide-in-from-bottom duration-300">
             <div class="p-5 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-                <button onclick="closeModal()" class="text-slate-400 font-bold p-2 text-xl">✕</button>
+                <button onclick="closeModal()" class="text-slate-400 font-bold p-2 text-xl hover:bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center">✕</button>
                 <div class="text-center">
-                    <span id="modal-day" class="text-[9px] font-black bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full uppercase">Day 01</span>
-                    <h3 id="modal-name" class="font-black text-slate-800">题目名称</h3>
+                    <span id="modal-day" class="text-[10px] font-black bg-blue-600 text-white px-3 py-1 rounded-full uppercase tracking-widest">DAY 01</span>
+                    <h3 id="modal-name" class="font-black text-slate-800 mt-1">题目名称</h3>
                 </div>
-                <button onclick="finishTask()" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-200">完成 ✨</button>
+                <button onclick="finishTask()" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-xl shadow-blue-100 active:scale-95 transition">打卡 ✨</button>
             </div>
             
             <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
-                <div class="flex-1 p-5 space-y-4 overflow-y-auto">
+                <div class="flex-1 p-6 space-y-5 overflow-y-auto">
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">📝 心得体会 / 核心逻辑</label>
-                        <textarea id="thought-input" class="w-full mt-2 p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm h-32 outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="写下这道题的直觉、空间复杂度、易错点..."></textarea>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">📝 思考心得</label>
+                        <textarea id="thought-input" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm h-32 outline-none focus:ring-4 focus:ring-blue-500/5 transition" placeholder="核心思路、复杂度分析、踩过的坑..."></textarea>
                     </div>
                     <div class="flex-1 flex flex-col">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">💻 C++ 核心代码</label>
-                        <textarea id="code-input" oninput="updatePreview()" class="code-font flex-1 w-full mt-2 p-4 bg-slate-900 text-blue-300 rounded-2xl text-sm outline-none min-h-[250px]" placeholder="// 粘贴你的 C++ 核心实现..."></textarea>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">💻 C++ 核心实现</label>
+                        <textarea id="code-input" oninput="updatePreview()" class="font-mono flex-1 w-full p-4 bg-slate-900 text-blue-200 rounded-2xl text-sm outline-none min-h-[280px] leading-relaxed" placeholder="// 在此输入代码..."></textarea>
                     </div>
                 </div>
-                <div class="hidden lg:block w-1/2 bg-[#1e1e1e] p-6 overflow-auto">
+                <div class="hidden lg:block w-1/2 bg-[#1d1d1d] p-6 overflow-auto border-l border-slate-800">
+                    <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">实时预览</div>
                     <pre><code id="code-preview" class="language-cpp"></code></pre>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/prism/1.29.0/prism.min.js"></script>
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/prism/1.29.0/components/prism-cpp.min.js"></script>
 
     <script>
-        // 核心数据 (已包含你提供的 8 周计划)
+        // --- 数据配置 ---
         const plan = [
-            { week: 1, title: "数组与双指针 🏁", days: [
-                { d: 1, tasks: ["1 两数之和", "26 删除重复项"] }, { d: 2, tasks: ["27 移除元素", "283 移动零"] },
-                { d: 3, tasks: ["88 合并数组", "977 有序数组平方"] }, { d: 4, tasks: ["704 二分查找", "35 搜索插入位置"] },
-                { d: 5, tasks: ["34 元素范围", "69 x的平方根"] }, { d: 6, tasks: ["189 轮转数组", "724 中心下标"] }
-            ]},
-            { week: 2, title: "字符串与栈入门 🛠️", days: [
-                { d: 8, tasks: ["387 唯一字符", "242 有效异位词"] }, { d: 9, tasks: ["383 赎金信", "415 字符串相加"] },
-                { d: 10, tasks: ["20 有效括号", "155 最小栈"] }, { d: 11, tasks: ["225 队列实现栈", "232 栈实现队列"] },
-                { d: 12, tasks: ["1047 删除重复项", "933 最近请求"] }, { d: 13, tasks: ["1700 吃午餐学生"] }, { d: 14, tasks: ["622 循环队列"] }
-            ]},
-            { week: 3, title: "栈进阶与哈希 📦", days: [
-                { d: 15, tasks: ["739 每日温度", "496 下一个更大元素 I"] }, { d: 16, tasks: ["150 逆波兰表达式"] },
-                { d: 17, tasks: ["71 简化路径"] }, { d: 18, tasks: ["946 验证栈序列"] },
-                { d: 19, tasks: ["503 下一个更大元素 II"] }, { d: 20, tasks: ["735 行星碰撞"] },
-                { d: 21, tasks: ["217 存在重复", "349 数组交集"] }
-            ]},
-            { week: 4, title: "滑动窗口 O(n) ⚡", days: [
-                { d: 22, tasks: ["350 数组交集 II", "202 快乐数"] }, { d: 23, tasks: ["454 四数相加 II"] },
-                { d: 24, tasks: ["167 两数之和 II", "977 有序数组平方"] }, { d: 25, tasks: ["11 盛水容器"] },
-                { d: 26, tasks: ["15 三数之和 ⭐"] }, { d: 27, tasks: ["209 最小子数组", "3 无重复最长串"] },
-                { d: 28, tasks: ["438 找到异位词"] }
-            ]},
-            { week: 5, title: "二叉树重头戏 🌲", days: [
-                { d: 29, tasks: ["144 前序遍历", "94 中序遍历"] }, { d: 30, tasks: ["145 后序遍历"] },
-                { d: 31, tasks: ["102 层序遍历"] }, { d: 32, tasks: ["104 最大深度", "111 最小深度"] },
-                { d: 33, tasks: ["226 翻转二叉树", "101 对称二叉树"] }, { d: 34, tasks: ["112 路径总和", "543 二叉树直径"] },
-                { d: 35, tasks: ["236 最近公共祖先"] }
-            ]},
-            { week: 6, title: "图与地图模型 🗺️", days: [
-                { d: 36, tasks: ["200 岛屿数量"] }, { d: 37, tasks: ["695 岛屿最大面积"] },
-                { d: 38, tasks: ["733 图像渲染"] }, { d: 39, tasks: ["994 腐烂的橘子"] },
-                { d: 40, tasks: ["542 01矩阵"] }, { d: 41, tasks: ["1091 最短路径"] },
-                { d: 42, tasks: ["200/695 二刷"] }
-            ]},
-            { week: 7, title: "回溯与DP入门 🧠", days: [
-                { d: 43, tasks: ["46 全排列"] }, { d: 44, tasks: ["47 全排列 II"] },
-                { d: 45, tasks: ["77 组合"] }, { d: 46, tasks: ["39 组合总和"] },
-                { d: 47, tasks: ["79 单词搜索"] }, { d: 48, tasks: ["131 分割回文串"] },
-                { d: 49, tasks: ["70 爬楼梯", "746 最小花费"] }
-            ]},
-            { week: 8, title: "DP进阶冲刺 🏆", days: [
-                { d: 50, tasks: ["198 打家劫舍"] }, { d: 51, tasks: ["213 打家劫舍 II"] },
-                { d: 52, tasks: ["62 不同路径", "63 不同路径 II"] }, { d: 53, tasks: ["64 最小路径和"] },
-                { d: 54, tasks: ["300 最长递增子序列"] }, { d: 55, tasks: ["322 零钱兑换"] },
-                { d: 56, tasks: ["560 子数组和", "84 最大矩形 ⭐"] }
-            ]}
+            { week: 1, title: "数组与双指针 🏁", days: [{ d: 1, tasks: ["1 两数之和", "26 删除重复项"] }, { d: 2, tasks: ["27 移除元素", "283 移动零"] }, { d: 3, tasks: ["88 合并数组", "977 有序数组平方"] }, { d: 4, tasks: ["704 二分查找", "35 搜索插入位置"] }, { d: 5, tasks: ["34 元素范围", "69 x的平方根"] }, { d: 6, tasks: ["189 轮转数组", "724 中心下标"] }] },
+            { week: 2, title: "字符串与栈入门 🛠️", days: [{ d: 8, tasks: ["387 唯一字符", "242 有效异位词"] }, { d: 9, tasks: ["383 赎金信", "415 字符串相加"] }, { d: 10, tasks: ["20 有效括号", "155 最小栈"] }, { d: 11, tasks: ["225 队列实现栈", "232 栈实现队列"] }, { d: 12, tasks: ["1047 删除重复项", "933 最近请求"] }, { d: 13, tasks: ["1700 吃午餐学生"] }, { d: 14, tasks: ["622 循环队列"] }] },
+            { week: 3, title: "栈进阶与哈希 📦", days: [{ d: 15, tasks: ["739 每日温度", "496 下一个更大元素 I"] }, { d: 16, tasks: ["150 逆波兰表达式"] }, { d: 17, tasks: ["71 简化路径"] }, { d: 18, tasks: ["946 验证栈序列"] }, { d: 19, tasks: ["503 下一个更大元素 II"] }, { d: 20, tasks: ["735 行星碰撞"] }, { d: 21, tasks: ["217 存在重复", "349 数组交集"] }] },
+            { week: 4, title: "滑动窗口 O(n) ⚡", days: [{ d: 22, tasks: ["350 数组交集 II", "202 快乐数"] }, { d: 23, tasks: ["454 四数相加 II"] }, { d: 24, tasks: ["167 两数之和 II", "977 有序数组平方"] }, { d: 25, tasks: ["11 盛水容器"] }, { d: 26, tasks: ["15 三数之和 ⭐"] }, { d: 27, tasks: ["209 最小子数组", "3 无重复最长串"] }, { d: 28, tasks: ["438 找到异位词"] }] },
+            { week: 5, title: "二叉树重头戏 🌲", days: [{ d: 29, tasks: ["144 前序遍历", "94 中序遍历"] }, { d: 30, tasks: ["145 后序遍历"] }, { d: 31, tasks: ["102 层序遍历"] }, { d: 32, tasks: ["104 最大深度", "111 最小深度"] }, { d: 33, tasks: ["226 翻转二叉树", "101 对称二叉树"] }, { d: 34, tasks: ["112 路径总和", "543 二叉树直径"] }, { d: 35, tasks: ["236 最近公共祖先"] }] },
+            { week: 6, title: "图与地图模型 🗺️", days: [{ d: 36, tasks: ["200 岛屿数量"] }, { d: 37, tasks: ["695 岛屿最大面积"] }, { d: 38, tasks: ["733 图像渲染"] }, { d: 39, tasks: ["994 腐烂的橘子"] }, { d: 40, tasks: ["542 01矩阵"] }, { d: 41, tasks: ["1091 最短路径"] }, { d: 42, tasks: ["200/695 二刷"] }] },
+            { week: 7, title: "回溯与DP入门 🧠", days: [{ d: 43, tasks: ["46 全排列"] }, { d: 44, tasks: ["47 全排列 II"] }, { d: 45, tasks: ["77 组合"] }, { d: 46, tasks: ["39 组合总和"] }, { d: 47, tasks: ["79 单词搜索"] }, { d: 48, tasks: ["131 分割回文串"] }, { d: 49, tasks: ["70 爬楼梯", "746 最小花费"] }] },
+            { week: 8, title: "DP进阶冲刺 🏆", days: [{ d: 50, tasks: ["198 打家劫舍"] }, { d: 51, tasks: ["213 打家劫舍 II"] }, { d: 52, tasks: ["62 不同路径", "63 不同路径 II"] }, { d: 53, tasks: ["64 最小路径和"] }, { d: 54, tasks: ["300 最长递增子序列"] }, { d: 55, tasks: ["322 零钱兑换"] }, { d: 56, tasks: ["560 子数组和", "84 最大矩形 ⭐"] }] }
         ];
 
-        let state = JSON.parse(localStorage.getItem('leihuo_ultra_v4') || '{"done":{}, "code":{}, "thoughts":{}}');
+        let state = JSON.parse(localStorage.getItem('leihuo_final_v5') || '{"done":{}, "code":{}, "thoughts":{}}');
         let currentWeek = 1;
         let activeTask = null;
 
+        // --- 初始化 ---
         async function init() {
             try {
-                // 自动尝试获取云端备份
                 const res = await fetch('leihuo_data.json?t=' + Date.now());
-                if (res.ok) {
-                    state = await res.json();
-                    console.log("云端同步成功");
-                }
-            } catch (e) { console.log("本地模式"); }
-            
+                if (res.ok) { state = await res.json(); }
+            } catch (e) {}
             renderNav();
             setWeek(1);
             updateProgress();
@@ -173,19 +135,18 @@
             const pcNav = document.getElementById('pc-nav');
             const mbNav = document.getElementById('mobile-nav');
             
-            const html = plan.map(w => `
-                <div onclick="setWeek(${w.week})" class="p-3 cursor-pointer transition flex items-center gap-3 ${currentWeek === w.week ? 'nav-active' : 'hover:text-slate-900'}">
-                    <span class="w-1.5 h-1.5 rounded-full ${currentWeek === w.week ? 'bg-blue-600' : 'bg-slate-300'}"></span>
+            const pcHtml = plan.map(w => `
+                <div onclick="setWeek(${w.week})" class="p-3.5 cursor-pointer transition-all flex items-center gap-3 ${currentWeek === w.week ? 'nav-active font-black' : 'hover:text-slate-900'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${currentWeek === w.week ? 'bg-blue-600 shadow-[0_0_8px_#3b82f6]' : 'bg-slate-300'}"></span>
                     W${w.week} · ${w.title.split(' ')[0]}
                 </div>
             `).join('');
-            
-            pcNav.innerHTML = html;
+            pcNav.innerHTML = pcHtml;
             
             mbNav.innerHTML = plan.map(w => `
-                <button onclick="setWeek(${w.week})" class="flex flex-col items-center gap-1 min-w-[50px] transition ${currentWeek === w.week ? 'mobile-nav-active' : 'text-slate-400'}">
-                    <span class="text-lg">${currentWeek === w.week ? '📍' : '⚪'}</span>
-                    <span class="text-[10px] font-black uppercase">W${w.week}</span>
+                <button onclick="setWeek(${w.week})" class="flex flex-col items-center gap-1 min-w-[55px] flex-shrink-0 transition-all ${currentWeek === w.week ? 'mobile-nav-active' : 'text-slate-400'}">
+                    <span class="text-xl">${currentWeek === w.week ? '📍' : '●'}</span>
+                    <span class="text-[9px] font-black uppercase tracking-tighter">W${w.week}</span>
                 </button>
             `).join('');
         }
@@ -199,21 +160,24 @@
             const area = document.getElementById('content-area');
             area.innerHTML = weekData.days.map(day => `
                 <div class="space-y-4">
-                    <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] flex items-center gap-2">
-                        <span class="h-px bg-slate-200 flex-1"></span> Day ${day.d} <span class="h-px bg-slate-200 flex-1"></span>
-                    </h3>
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest whitespace-nowrap">Day ${day.d}</span>
+                        <div class="h-px bg-slate-200 w-full"></div>
+                    </div>
                     <div class="grid gap-3">
                         ${day.tasks.map(t => {
                             const isDone = state.done[t];
                             return `
-                            <div onclick="openModal('${t}', ${day.d})" class="bg-white rounded-2xl p-5 flex items-center justify-between card-shadow cursor-pointer hover:-translate-y-1 transition-all border border-transparent hover:border-blue-100 group">
+                            <div onclick="openModal('${t}', ${day.d})" class="bg-white rounded-2xl p-5 flex items-center justify-between card-shadow cursor-pointer hover:-translate-y-1 active:scale-[0.98] transition-all border border-transparent hover:border-blue-100 group">
                                 <div class="flex items-center gap-4">
                                     <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm ${isDone ? 'bg-green-100 text-green-600' : 'bg-slate-50 text-slate-300'}">
                                         ${isDone ? '✓' : '!'}
                                     </div>
-                                    <div class="font-bold text-slate-700">${t}</div>
+                                    <div class="font-bold text-slate-700 text-sm lg:text-base">${t}</div>
                                 </div>
-                                <div class="text-[10px] font-bold text-slate-300 group-hover:text-blue-500">${state.code[t] ? 'REVIEW' : 'START'}</div>
+                                <div class="text-[10px] font-black text-slate-300 group-hover:text-blue-500 uppercase tracking-widest transition">
+                                    ${state.code[t] ? 'REVIEW' : 'GO'}
+                                </div>
                             </div>`;
                         }).join('')}
                     </div>
@@ -230,7 +194,7 @@
             document.getElementById('thought-input').value = state.thoughts[name] || '';
             document.getElementById('modal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            updatePreview();
+            setTimeout(updatePreview, 50); // 确保高亮
         }
 
         function closeModal() {
@@ -238,16 +202,22 @@
             document.body.style.overflow = 'auto';
         }
 
+        function updatePreview() {
+            const preview = document.getElementById('code-preview');
+            preview.textContent = document.getElementById('code-input').value;
+            if (window.Prism) { Prism.highlightElement(preview); }
+        }
+
         function finishTask() {
             const code = document.getElementById('code-input').value;
-            if (code.length < 10) return alert("写点代码记录一下吧！");
+            if (code.length < 5) return alert("笔记不能太短哦！");
             
             state.done[activeTask] = true;
             state.code[activeTask] = code;
             state.thoughts[activeTask] = document.getElementById('thought-input').value;
-            localStorage.setItem('leihuo_ultra_v4', JSON.stringify(state));
+            localStorage.setItem('leihuo_final_v5', JSON.stringify(state));
             
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            confetti({ particleCount: 120, spread: 70, origin: { y: 0.7 }, colors: ['#3b82f6', '#22c55e'] });
             closeModal();
             setWeek(currentWeek);
             updateProgress();
@@ -261,17 +231,11 @@
             document.getElementById('prog-val').innerText = percent + '%';
         }
 
-        function updatePreview() {
-            const preview = document.getElementById('code-preview');
-            preview.textContent = document.getElementById('code-input').value;
-            Prism.highlightElement(preview);
-        }
-
         function exportData() {
             const blob = new Blob([JSON.stringify(state)], {type: "application/json"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = "leihuo_data.json"; a.click();
-            alert("备份成功！请将下载的 leihuo_data.json 上传至 GitHub 以同步。");
+            alert("备份成功！请将其上传到 GitHub 同步。");
         }
 
         init();
