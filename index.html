@@ -3,240 +3,473 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>雷火引擎岗 | 56日算法突击</title>
-    
-    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <title>雷火算法通关 Pro | 56天突击</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-        :root { --blue: #3b82f6; --green: #22c55e; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #1e293b; overflow-x: hidden; }
-        
-        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .card-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
-        .nav-active { background: white; color: var(--blue); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); border-radius: 14px; }
-        .mobile-nav-active { color: var(--blue); font-weight: 800; transform: translateY(-2px); }
-        
-        /* 核心高亮优化 */
-        code[class*="language-"], pre[class*="language-"] { 
-            font-family: 'JetBrains Mono', monospace !important; 
-            font-size: 13px !important; 
-            text-shadow: none !important;
+        :root {
+            --diff-easy: #10b981;
+            --diff-med: #f59e0b;
+            --diff-hard: #ef4444;
         }
-        pre { border-radius: 12px !important; margin: 0 !important; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        body { font-family: 'Noto Sans SC', -apple-system, sans-serif; background: #f3f4f6; -webkit-tap-highlight-color: transparent; }
         
-        /* 适配移动端横向滚动代码 */
-        #code-preview { white-space: pre !important; overflow-x: auto !important; word-break: normal !important; word-wrap: normal !important; }
+        /* 移动端代码字体优化 */
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        @media (max-width: 768px) {
+            .code-font { font-size: 12px !important; line-height: 1.4 !important; }
+            #code-preview { font-size: 11px !important; }
+        }
+
+        /* 玻璃拟态与卡片 */
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.5); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:active { transform: scale(0.98); }
+        @media(min-width: 1024px) {
+            .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        }
+
+        /* 侧边栏激活态 */
+        .nav-active { background: white; color: #2563eb; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); border-radius: 12px; }
+        
+        /* 难度标签 */
+        .badge { padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        .badge-easy { background: #d1fae5; color: #059669; }
+        .badge-med { background: #fef3c7; color: #d97706; }
+        .badge-hard { background: #fee2e2; color: #dc2626; }
+
+        /* 进度条动画 */
+        .progress-fill { transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        
+        /* Tab 切换动画 */
+        .tab-content { display: none; animation: fadeIn 0.2s ease; }
+        .tab-content.active { display: block; display: flex; flex-direction: column; height: 100%; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .tab-btn { position: relative; color: #94a3b8; transition: all 0.3s; }
+        .tab-btn.active { color: #2563eb; font-weight: bold; }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 100%; height: 2px; background: #2563eb; border-radius: 2px; }
     </style>
 </head>
-<body class="pb-24 lg:pb-0">
+<body class="text-slate-700 h-screen overflow-hidden flex flex-col lg:flex-row">
 
-    <div class="flex min-h-screen">
-        <aside class="hidden lg:flex flex-col w-72 bg-slate-50 border-r border-slate-200 sticky top-0 h-screen p-6">
-            <div class="mb-10 p-2">
-                <h1 class="text-2xl font-black tracking-tighter text-slate-800 italic">🔥 LEIHUO <span class="text-blue-600">ROAD</span></h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">网易雷火引擎岗特训</p>
+    <div class="lg:hidden h-16 glass sticky top-0 z-40 flex items-center justify-between px-4 border-b border-slate-200">
+        <span class="font-black italic text-lg tracking-tighter">🔥 PRO</span>
+        <select id="mobile-week-select" onchange="setWeek(parseInt(this.value))" class="bg-white/50 border border-slate-200 text-sm font-bold rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-blue-500">
+            </select>
+        <div class="w-20">
+             <div class="text-[10px] text-right font-bold text-slate-400 mb-1">总进度</div>
+             <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div id="mobile-global-prog" class="h-full bg-blue-500 rounded-full progress-fill" style="width: 0%"></div>
             </div>
-            
-            <nav id="pc-nav" class="flex-1 space-y-1.5 overflow-y-auto no-scrollbar font-bold text-slate-500 text-sm">
-                </nav>
-
-            <div class="mt-6 p-5 glass rounded-[2rem] card-shadow">
-                <div class="flex justify-between text-[11px] font-black mb-2 uppercase tracking-tighter"><span>Overall Progress</span><span id="prog-val" class="text-blue-600">0%</span></div>
-                <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <div id="prog-bar" class="h-full bg-blue-500 transition-all duration-1000" style="width: 0%"></div>
-                </div>
-            </div>
-        </aside>
-
-        <main class="flex-1 flex flex-col min-w-0">
-            <header class="h-16 glass sticky top-0 z-30 px-6 lg:px-10 flex justify-between items-center border-b border-slate-200">
-                <h2 id="current-title" class="font-black text-slate-700 uppercase tracking-tight truncate mr-4">第 1 周：基础准备</h2>
-                <div class="flex items-center gap-2">
-                    <button onclick="exportData()" class="text-[11px] font-black bg-slate-800 text-white px-4 py-2 rounded-xl shadow-lg hover:bg-slate-700 transition active:scale-95">备份 💾</button>
-                </div>
-            </header>
-
-            <div id="content-area" class="p-4 lg:p-10 max-w-4xl mx-auto w-full space-y-8">
-                </div>
-        </main>
+        </div>
     </div>
 
-    <div class="lg:hidden fixed bottom-0 left-0 right-0 glass border-t border-slate-200 flex items-center h-20 z-40 px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.08)]">
-        <div id="mobile-nav" class="flex gap-6 overflow-x-auto no-scrollbar w-full items-center py-2">
+    <aside class="hidden lg:flex flex-col w-80 bg-slate-50 border-r border-slate-200 h-screen p-6 overflow-hidden">
+        <div class="mb-8">
+            <h1 class="text-3xl font-black text-slate-800 tracking-tighter italic">🔥 ENGINE <span class="text-blue-600">PRO</span></h1>
+            <p class="text-xs text-slate-400 font-bold uppercase mt-2 tracking-widest pl-1">雷火算法 56日突击</p>
+        </div>
+        
+        <div class="glass p-5 rounded-2xl mb-6 shadow-sm">
+            <div class="flex justify-between items-end mb-2">
+                <span class="text-xs font-bold text-slate-500">GLOBAL PROGRESS</span>
+                <span id="prog-val" class="text-2xl font-black text-blue-600">0%</span>
             </div>
-    </div>
+            <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div id="prog-bar" class="h-full bg-blue-600 progress-fill shadow-[0_0_10px_rgba(37,99,235,0.5)]" style="width: 0%"></div>
+            </div>
+        </div>
 
-    <div id="modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-md flex items-end lg:items-center justify-center p-0 lg:p-6">
-        <div class="bg-white w-full h-[92vh] lg:h-full lg:max-h-[850px] lg:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden max-w-6xl animate-in slide-in-from-bottom duration-300">
-            <div class="p-5 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-                <button onclick="closeModal()" class="text-slate-400 font-bold p-2 text-xl hover:bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center">✕</button>
-                <div class="text-center">
-                    <span id="modal-day" class="text-[10px] font-black bg-blue-600 text-white px-3 py-1 rounded-full uppercase tracking-widest">DAY 01</span>
-                    <h3 id="modal-name" class="font-black text-slate-800 mt-1">题目名称</h3>
-                </div>
-                <button onclick="finishTask()" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-xl shadow-blue-100 active:scale-95 transition">打卡 ✨</button>
+        <nav id="sidebar-nav" class="flex-1 overflow-y-auto space-y-2 pr-2 pb-10">
+            </nav>
+        
+        <button onclick="exportData()" class="mt-4 flex items-center justify-center gap-2 w-full py-3 text-xs font-bold text-slate-500 hover:bg-white hover:text-blue-600 rounded-xl transition border border-dashed border-slate-300">
+            <span>💾 备份数据</span>
+        </button>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#f8fafc]">
+        <header class="hidden lg:flex h-20 px-10 justify-between items-center border-b border-slate-200 bg-white/50 backdrop-blur">
+            <div>
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Current Mission</div>
+                <h2 id="current-title" class="text-2xl font-bold text-slate-800">Loading...</h2>
             </div>
-            
-            <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
-                <div class="flex-1 p-6 space-y-5 overflow-y-auto">
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">📝 思考心得</label>
-                        <textarea id="thought-input" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm h-32 outline-none focus:ring-4 focus:ring-blue-500/5 transition" placeholder="核心思路、复杂度分析、踩过的坑..."></textarea>
+            <div id="week-summary" class="flex gap-6 text-sm">
+                </div>
+        </header>
+
+        <div id="content-area" class="flex-1 overflow-y-auto p-4 lg:p-10 scroll-smooth">
+            <div class="max-w-5xl mx-auto space-y-8 pb-20">
+                </div>
+        </div>
+    </main>
+
+    <div id="modal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-[2px] opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-x-0 bottom-0 lg:top-0 lg:inset-0 flex items-center justify-center p-0 lg:p-8">
+            <div class="bg-white w-full lg:w-[900px] h-[85vh] lg:h-[80vh] rounded-t-3xl lg:rounded-3xl shadow-2xl flex flex-col overflow-hidden transform transition-transform duration-300 translate-y-full lg:translate-y-0 scale-95" id="modal-panel">
+                
+                <div class="h-16 px-6 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <span id="modal-diff" class="badge badge-med shrink-0">MED</span>
+                        <h3 id="modal-name" class="font-bold text-slate-800 truncate">题目名称</h3>
                     </div>
-                    <div class="flex-1 flex flex-col">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">💻 C++ 核心实现</label>
-                        <textarea id="code-input" oninput="updatePreview()" class="font-mono flex-1 w-full p-4 bg-slate-900 text-blue-200 rounded-2xl text-sm outline-none min-h-[280px] leading-relaxed" placeholder="// 在此输入代码..."></textarea>
+                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition">✕</button>
+                </div>
+
+                <div class="px-6 border-b border-slate-100 flex gap-8 text-sm font-medium bg-slate-50/50 shrink-0">
+                    <button onclick="switchTab('thought')" id="btn-tab-thought" class="tab-btn active py-3">💡 解题心得</button>
+                    <button onclick="switchTab('code')" id="btn-tab-code" class="tab-btn py-3">💻 核心代码</button>
+                </div>
+
+                <div class="flex-1 overflow-hidden relative bg-slate-50">
+                    <div id="tab-thought" class="tab-content active h-full p-4 lg:p-6">
+                        <textarea id="thought-input" 
+                            class="w-full h-full p-4 bg-white border border-slate-200 rounded-xl text-sm leading-relaxed outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none transition shadow-sm" 
+                            placeholder="记录你的思路：&#10;1. 核心直觉是什么？&#10;2. 遇到了什么坑？&#10;3. 时间复杂度是多少？"></textarea>
+                    </div>
+
+                    <div id="tab-code" class="tab-content h-full flex flex-col lg:flex-row">
+                        <div class="flex-1 flex flex-col h-full border-r border-slate-200 bg-[#1e1e1e]">
+                             <textarea id="code-input" oninput="updatePreview()" spellcheck="false"
+                                class="code-font flex-1 w-full p-4 bg-transparent text-gray-300 text-sm outline-none resize-none border-none" 
+                                placeholder="// 在此粘贴你的 C++ 核心代码..."></textarea>
+                        </div>
+                        <div class="hidden lg:block flex-1 bg-[#1e1e1e] overflow-auto custom-scrollbar">
+                            <pre class="!m-0 !p-4 !bg-transparent h-full"><code id="code-preview" class="language-cpp code-font"></code></pre>
+                        </div>
                     </div>
                 </div>
-                <div class="hidden lg:block w-1/2 bg-[#1d1d1d] p-6 overflow-auto border-l border-slate-800">
-                    <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">实时预览</div>
-                    <pre><code id="code-preview" class="language-cpp"></code></pre>
+
+                <div class="p-4 border-t border-slate-100 bg-white shrink-0 flex justify-between items-center safe-area-bottom">
+                    <span class="text-xs text-slate-400 font-medium hidden lg:inline">坚持就是胜利 🏃</span>
+                    <button onclick="finishTask()" class="w-full lg:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-600/30 active:scale-95 transition flex items-center justify-center gap-2">
+                        <span>完成打卡</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/prism/1.29.0/prism.min.js"></script>
-    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/prism/1.29.0/components/prism-cpp.min.js"></script>
-
     <script>
-        // --- 数据配置 ---
+        // 题目难度映射库 (根据 LeetCode 常见难度)
+        const difficultyMap = {
+            '1': 'easy', '26': 'easy', '27': 'easy', '283': 'easy', '88': 'easy', '977': 'easy',
+            '704': 'easy', '35': 'easy', '34': 'medium', '69': 'easy', '189': 'medium', '724': 'easy',
+            '387': 'easy', '242': 'easy', '383': 'easy', '415': 'easy', '20': 'easy', '155': 'medium',
+            '225': 'easy', '232': 'easy', '1047': 'easy', '933': 'easy', '1700': 'easy', '622': 'medium',
+            '739': 'medium', '496': 'easy', '150': 'medium', '71': 'medium', '946': 'medium', '503': 'medium',
+            '735': 'medium', '217': 'easy', '349': 'easy', '350': 'easy', '202': 'easy', '454': 'medium',
+            '167': 'medium', '11': 'medium', '15': 'medium', '209': 'medium', '3': 'medium', '438': 'medium',
+            '144': 'easy', '94': 'easy', '145': 'easy', '102': 'medium', '104': 'easy', '111': 'easy',
+            '226': 'easy', '101': 'easy', '112': 'easy', '543': 'easy', '236': 'medium', '200': 'medium',
+            '695': 'medium', '733': 'easy', '994': 'medium', '542': 'medium', '1091': 'medium',
+            '46': 'medium', '47': 'medium', '77': 'medium', '39': 'medium', '79': 'medium', '131': 'medium',
+            '70': 'easy', '746': 'easy', '198': 'medium', '213': 'medium', '62': 'medium', '63': 'medium',
+            '64': 'medium', '300': 'medium', '322': 'medium', '560': 'medium', '84': 'hard'
+        };
+
         const plan = [
-            { week: 1, title: "数组与双指针 🏁", days: [{ d: 1, tasks: ["1 两数之和", "26 删除重复项"] }, { d: 2, tasks: ["27 移除元素", "283 移动零"] }, { d: 3, tasks: ["88 合并数组", "977 有序数组平方"] }, { d: 4, tasks: ["704 二分查找", "35 搜索插入位置"] }, { d: 5, tasks: ["34 元素范围", "69 x的平方根"] }, { d: 6, tasks: ["189 轮转数组", "724 中心下标"] }] },
-            { week: 2, title: "字符串与栈入门 🛠️", days: [{ d: 8, tasks: ["387 唯一字符", "242 有效异位词"] }, { d: 9, tasks: ["383 赎金信", "415 字符串相加"] }, { d: 10, tasks: ["20 有效括号", "155 最小栈"] }, { d: 11, tasks: ["225 队列实现栈", "232 栈实现队列"] }, { d: 12, tasks: ["1047 删除重复项", "933 最近请求"] }, { d: 13, tasks: ["1700 吃午餐学生"] }, { d: 14, tasks: ["622 循环队列"] }] },
-            { week: 3, title: "栈进阶与哈希 📦", days: [{ d: 15, tasks: ["739 每日温度", "496 下一个更大元素 I"] }, { d: 16, tasks: ["150 逆波兰表达式"] }, { d: 17, tasks: ["71 简化路径"] }, { d: 18, tasks: ["946 验证栈序列"] }, { d: 19, tasks: ["503 下一个更大元素 II"] }, { d: 20, tasks: ["735 行星碰撞"] }, { d: 21, tasks: ["217 存在重复", "349 数组交集"] }] },
-            { week: 4, title: "滑动窗口 O(n) ⚡", days: [{ d: 22, tasks: ["350 数组交集 II", "202 快乐数"] }, { d: 23, tasks: ["454 四数相加 II"] }, { d: 24, tasks: ["167 两数之和 II", "977 有序数组平方"] }, { d: 25, tasks: ["11 盛水容器"] }, { d: 26, tasks: ["15 三数之和 ⭐"] }, { d: 27, tasks: ["209 最小子数组", "3 无重复最长串"] }, { d: 28, tasks: ["438 找到异位词"] }] },
-            { week: 5, title: "二叉树重头戏 🌲", days: [{ d: 29, tasks: ["144 前序遍历", "94 中序遍历"] }, { d: 30, tasks: ["145 后序遍历"] }, { d: 31, tasks: ["102 层序遍历"] }, { d: 32, tasks: ["104 最大深度", "111 最小深度"] }, { d: 33, tasks: ["226 翻转二叉树", "101 对称二叉树"] }, { d: 34, tasks: ["112 路径总和", "543 二叉树直径"] }, { d: 35, tasks: ["236 最近公共祖先"] }] },
-            { week: 6, title: "图与地图模型 🗺️", days: [{ d: 36, tasks: ["200 岛屿数量"] }, { d: 37, tasks: ["695 岛屿最大面积"] }, { d: 38, tasks: ["733 图像渲染"] }, { d: 39, tasks: ["994 腐烂的橘子"] }, { d: 40, tasks: ["542 01矩阵"] }, { d: 41, tasks: ["1091 最短路径"] }, { d: 42, tasks: ["200/695 二刷"] }] },
-            { week: 7, title: "回溯与DP入门 🧠", days: [{ d: 43, tasks: ["46 全排列"] }, { d: 44, tasks: ["47 全排列 II"] }, { d: 45, tasks: ["77 组合"] }, { d: 46, tasks: ["39 组合总和"] }, { d: 47, tasks: ["79 单词搜索"] }, { d: 48, tasks: ["131 分割回文串"] }, { d: 49, tasks: ["70 爬楼梯", "746 最小花费"] }] },
-            { week: 8, title: "DP进阶冲刺 🏆", days: [{ d: 50, tasks: ["198 打家劫舍"] }, { d: 51, tasks: ["213 打家劫舍 II"] }, { d: 52, tasks: ["62 不同路径", "63 不同路径 II"] }, { d: 53, tasks: ["64 最小路径和"] }, { d: 54, tasks: ["300 最长递增子序列"] }, { d: 55, tasks: ["322 零钱兑换"] }, { d: 56, tasks: ["560 子数组和", "84 最大矩形 ⭐"] }] }
+            { week: 1, title: "数组与双指针 🏁", days: [
+                { d: 1, tasks: ["1 两数之和", "26 删除重复项"] },
+                { d: 2, tasks: ["27 移除元素", "283 移动零"] },
+                { d: 3, tasks: ["88 合并数组", "977 有序数组平方"] },
+                { d: 4, tasks: ["704 二分查找", "35 搜索插入位置"] },
+                { d: 5, tasks: ["34 元素范围", "69 x的平方根"] },
+                { d: 6, tasks: ["189 轮转数组", "724 中心下标"] }
+            ]},
+            { week: 2, title: "栈队列入门 🛠️", days: [
+                { d: 8, tasks: ["387 唯一字符", "242 有效异位词"] },
+                { d: 9, tasks: ["383 赎金信", "415 字符串相加"] },
+                { d: 10, tasks: ["20 有效括号", "155 最小栈"] },
+                { d: 11, tasks: ["225 队列实现栈", "232 栈实现队列"] },
+                { d: 12, tasks: ["1047 删除重复项", "933 最近请求"] },
+                { d: 13, tasks: ["1700 吃午餐的学生"] },
+                { d: 14, tasks: ["622 循环队列"] }
+            ]},
+            { week: 3, title: "栈进阶与哈希 📦", days: [
+                { d: 15, tasks: ["739 每日温度", "496 下一个更大元素 I"] },
+                { d: 16, tasks: ["150 逆波兰表达式"] },
+                { d: 17, tasks: ["71 简化路径"] },
+                { d: 18, tasks: ["946 验证栈序列"] },
+                { d: 19, tasks: ["503 下一个更大元素 II"] },
+                { d: 20, tasks: ["735 行星碰撞"] },
+                { d: 21, tasks: ["217 存在重复", "349 数组交集"] }
+            ]},
+            { week: 4, title: "滑动窗口 O(n) ⚡", days: [
+                { d: 22, tasks: ["350 数组交集 II", "202 快乐数"] },
+                { d: 23, tasks: ["454 四数相加 II"] },
+                { d: 24, tasks: ["167 两数之和 II", "977 有序数组平方"] },
+                { d: 25, tasks: ["11 盛水容器"] },
+                { d: 26, tasks: ["15 三数之和 ⭐"] },
+                { d: 27, tasks: ["209 最小子数组", "3 无重复最长串"] },
+                { d: 28, tasks: ["438 找到异位词"] }
+            ]},
+            { week: 5, title: "二叉树重头戏 🌲", days: [
+                { d: 29, tasks: ["144 前序遍历", "94 中序遍历"] },
+                { d: 30, tasks: ["145 后序遍历"] },
+                { d: 31, tasks: ["102 层序遍历"] },
+                { d: 32, tasks: ["104 最大深度", "111 最小深度"] },
+                { d: 33, tasks: ["226 翻转二叉树", "101 对称二叉树"] },
+                { d: 34, tasks: ["112 路径总和", "543 二叉树直径"] },
+                { d: 35, tasks: ["236 最近公共祖先"] }
+            ]},
+            { week: 6, title: "图与地图模型 🗺️", days: [
+                { d: 36, tasks: ["200 岛屿数量"] },
+                { d: 37, tasks: ["695 岛屿最大面积"] },
+                { d: 38, tasks: ["733 图像渲染"] },
+                { d: 39, tasks: ["994 腐烂的橘子"] },
+                { d: 40, tasks: ["542 01矩阵"] },
+                { d: 41, tasks: ["1091 最短路径"] },
+                { d: 42, tasks: ["200/695 二刷"] }
+            ]},
+            { week: 7, title: "回溯与DP入门 🧠", days: [
+                { d: 43, tasks: ["46 全排列"] },
+                { d: 44, tasks: ["47 全排列 II"] },
+                { d: 45, tasks: ["77 组合"] },
+                { d: 46, tasks: ["39 组合总和"] },
+                { d: 47, tasks: ["79 单词搜索"] },
+                { d: 48, tasks: ["131 分割回文串"] },
+                { d: 49, tasks: ["70 爬楼梯", "746 最小花费"] }
+            ]},
+            { week: 8, title: "DP进阶冲刺 🏆", days: [
+                { d: 50, tasks: ["198 打家劫舍"] },
+                { d: 51, tasks: ["213 打家劫舍 II"] },
+                { d: 52, tasks: ["62 不同路径", "63 不同路径 II"] },
+                { d: 53, tasks: ["64 最小路径和"] },
+                { d: 54, tasks: ["300 最长递增子序列"] },
+                { d: 55, tasks: ["322 零钱兑换"] },
+                { d: 56, tasks: ["560 子数组和", "84 最大矩形 ⭐"] }
+            ]}
         ];
 
-        let state = JSON.parse(localStorage.getItem('leihuo_final_v5') || '{"done":{}, "code":{}, "thoughts":{}}');
+        let state = JSON.parse(localStorage.getItem('leihuo_road_v3') || '{"done":{}, "code":{}, "thoughts":{}}');
         let currentWeek = 1;
         let activeTask = null;
 
-        // --- 初始化 ---
-        async function init() {
-            try {
-                const res = await fetch('leihuo_data.json?t=' + Date.now());
-                if (res.ok) { state = await res.json(); }
-            } catch (e) {}
-            renderNav();
+        function init() {
+            renderSidebar();
             setWeek(1);
-            updateProgress();
+            updateGlobalProgress();
         }
 
-        function renderNav() {
-            const pcNav = document.getElementById('pc-nav');
-            const mbNav = document.getElementById('mobile-nav');
+        // 获取难度信息
+        function getDifficulty(taskStr) {
+            const num = taskStr.split(' ')[0];
+            const diff = difficultyMap[num] || 'medium'; // 默认中等
+            const colors = {
+                'easy': { class: 'badge-easy', label: 'EASY' },
+                'medium': { class: 'badge-med', label: 'MED' },
+                'hard': { class: 'badge-hard', label: 'HARD' }
+            };
+            return colors[diff];
+        }
+
+        function renderSidebar() {
+            const nav = document.getElementById('sidebar-nav');
+            const mobileSelect = document.getElementById('mobile-week-select');
             
-            const pcHtml = plan.map(w => `
-                <div onclick="setWeek(${w.week})" class="p-3.5 cursor-pointer transition-all flex items-center gap-3 ${currentWeek === w.week ? 'nav-active font-black' : 'hover:text-slate-900'}">
-                    <span class="w-1.5 h-1.5 rounded-full ${currentWeek === w.week ? 'bg-blue-600 shadow-[0_0_8px_#3b82f6]' : 'bg-slate-300'}"></span>
-                    W${w.week} · ${w.title.split(' ')[0]}
-                </div>
-            `).join('');
-            pcNav.innerHTML = pcHtml;
-            
-            mbNav.innerHTML = plan.map(w => `
-                <button onclick="setWeek(${w.week})" class="flex flex-col items-center gap-1 min-w-[55px] flex-shrink-0 transition-all ${currentWeek === w.week ? 'mobile-nav-active' : 'text-slate-400'}">
-                    <span class="text-xl">${currentWeek === w.week ? '📍' : '●'}</span>
-                    <span class="text-[9px] font-black uppercase tracking-tighter">W${w.week}</span>
-                </button>
-            `).join('');
+            let navHtml = '';
+            let selectHtml = '';
+
+            plan.forEach(w => {
+                // 计算周进度
+                const allTasks = w.days.flatMap(d => d.tasks);
+                const doneCount = allTasks.filter(t => state.done[t]).length;
+                const weekPercent = Math.round((doneCount / allTasks.length) * 100);
+
+                // 侧边栏 HTML
+                const isActive = currentWeek === w.week;
+                navHtml += `
+                <div onclick="setWeek(${w.week})" class="p-4 cursor-pointer transition-all duration-300 group ${isActive ? 'nav-active' : 'hover:bg-white/50 text-slate-500'}">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-bold">WEEK ${w.week}</span>
+                        <span class="text-[10px] font-bold ${isActive ? 'text-blue-500' : 'text-slate-300'}">${weekPercent}%</span>
+                    </div>
+                    <div class="text-xs truncate opacity-70 mb-2">${w.title.replace(/ .*/, '')}</div>
+                    <div class="h-1 bg-slate-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 rounded-full" style="width: ${weekPercent}%"></div>
+                    </div>
+                </div>`;
+
+                // 移动端 Select HTML
+                selectHtml += `<option value="${w.week}" ${isActive ? 'selected' : ''}>Week ${w.week}: ${w.title.split(' ')[0]}</option>`;
+            });
+
+            nav.innerHTML = navHtml;
+            mobileSelect.innerHTML = selectHtml;
         }
 
         function setWeek(w) {
             currentWeek = w;
-            renderNav();
-            const weekData = plan.find(x => x.week === w);
-            document.getElementById('current-title').innerText = weekData.title;
+            renderSidebar(); // 更新选中状态
             
+            const weekData = plan.find(x => x.week === w);
+            const titleElem = document.getElementById('current-title');
+            if(titleElem) titleElem.innerText = `WEEK ${w} : ${weekData.title}`;
+
+            // 计算该周的数据
+            const weekTasks = weekData.days.flatMap(d => d.tasks);
+            const weekDone = weekTasks.filter(t => state.done[t]).length;
+            const summaryElem = document.getElementById('week-summary');
+            if(summaryElem) {
+                summaryElem.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400">已完成</span>
+                        <span class="font-bold text-slate-800">${weekDone} / ${weekTasks.length}</span>
+                    </div>
+                `;
+            }
+
             const area = document.getElementById('content-area');
             area.innerHTML = weekData.days.map(day => `
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4">
-                        <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest whitespace-nowrap">Day ${day.d}</span>
-                        <div class="h-px bg-slate-200 w-full"></div>
+                <div class="flex flex-col md:flex-row gap-2 md:gap-6">
+                    <div class="shrink-0 w-16 pt-2">
+                         <div class="text-xs font-black text-slate-300 uppercase tracking-widest">DAY ${day.d}</div>
                     </div>
-                    <div class="grid gap-3">
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                         ${day.tasks.map(t => {
                             const isDone = state.done[t];
+                            const diffInfo = getDifficulty(t);
                             return `
-                            <div onclick="openModal('${t}', ${day.d})" class="bg-white rounded-2xl p-5 flex items-center justify-between card-shadow cursor-pointer hover:-translate-y-1 active:scale-[0.98] transition-all border border-transparent hover:border-blue-100 group">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm ${isDone ? 'bg-green-100 text-green-600' : 'bg-slate-50 text-slate-300'}">
-                                        ${isDone ? '✓' : '!'}
+                            <div onclick="openModal('${t}', ${day.d})" class="glass rounded-xl p-5 flex justify-between items-center cursor-pointer card-hover group border-l-4 ${isDone ? 'border-l-blue-500' : 'border-l-transparent'}">
+                                <div class="flex items-center gap-4 min-w-0">
+                                    <div class="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-lg transition-colors ${isDone ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-400'}">
+                                        ${isDone ? '✓' : '⚡'}
                                     </div>
-                                    <div class="font-bold text-slate-700 text-sm lg:text-base">${t}</div>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="badge ${diffInfo.class}">${diffInfo.label}</span>
+                                            <span class="text-[10px] text-slate-400 font-bold uppercase hidden sm:inline-block">${isDone ? '已存档' : '待完成'}</span>
+                                        </div>
+                                        <div class="font-bold text-slate-700 text-sm sm:text-base truncate pr-2">${t}</div>
+                                    </div>
                                 </div>
-                                <div class="text-[10px] font-black text-slate-300 group-hover:text-blue-500 uppercase tracking-widest transition">
-                                    ${state.code[t] ? 'REVIEW' : 'GO'}
-                                </div>
+                                <div class="text-slate-300 group-hover:text-blue-500 transition px-2">➜</div>
                             </div>`;
                         }).join('')}
                     </div>
                 </div>
             `).join('');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // --- 模态框逻辑 ---
 
         function openModal(name, day) {
             activeTask = name;
-            document.getElementById('modal-day').innerText = `Day ${day < 10 ? '0'+day : day}`;
+            const diff = getDifficulty(name);
+            const diffBadge = document.getElementById('modal-diff');
+            
+            diffBadge.className = `badge ${diff.class} shrink-0`;
+            diffBadge.innerText = diff.label;
+            
             document.getElementById('modal-name').innerText = name;
             document.getElementById('code-input').value = state.code[name] || '';
             document.getElementById('thought-input').value = state.thoughts[name] || '';
-            document.getElementById('modal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            setTimeout(updatePreview, 50); // 确保高亮
+            
+            const modal = document.getElementById('modal');
+            const panel = document.getElementById('modal-panel');
+            
+            modal.classList.remove('hidden');
+            // 小延迟触发动画
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                panel.classList.remove('translate-y-full', 'scale-95');
+            }, 10);
+
+            switchTab('thought'); // 默认打开心得
+            updatePreview();
         }
 
         function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
+            const modal = document.getElementById('modal');
+            const panel = document.getElementById('modal-panel');
+            
+            modal.classList.add('opacity-0');
+            panel.classList.add('translate-y-full', 'scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         }
 
-        function updatePreview() {
-            const preview = document.getElementById('code-preview');
-            preview.textContent = document.getElementById('code-input').value;
-            if (window.Prism) { Prism.highlightElement(preview); }
+        function switchTab(tabName) {
+            // Update Buttons
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-tab-${tabName}`).classList.add('active');
+
+            // Update Content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
         function finishTask() {
             const code = document.getElementById('code-input').value;
-            if (code.length < 5) return alert("笔记不能太短哦！");
+            const thought = document.getElementById('thought-input').value;
+            
+            if(code.length < 5 && thought.length < 5) return alert("笔记或代码至少写一点吧？🤔");
             
             state.done[activeTask] = true;
             state.code[activeTask] = code;
-            state.thoughts[activeTask] = document.getElementById('thought-input').value;
-            localStorage.setItem('leihuo_final_v5', JSON.stringify(state));
+            state.thoughts[activeTask] = thought;
+            localStorage.setItem('leihuo_road_v3', JSON.stringify(state));
             
-            confetti({ particleCount: 120, spread: 70, origin: { y: 0.7 }, colors: ['#3b82f6', '#22c55e'] });
+            // 撒花
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 }, colors: ['#3b82f6', '#10b981', '#f59e0b'] });
+            
             closeModal();
             setWeek(currentWeek);
-            updateProgress();
+            updateGlobalProgress();
         }
 
-        function updateProgress() {
+        function updateGlobalProgress() {
             const total = plan.flatMap(w => w.days.flatMap(d => d.tasks)).length;
             const done = Object.keys(state.done).length;
             const percent = Math.round((done / total) * 100);
-            document.getElementById('prog-bar').style.width = percent + '%';
-            document.getElementById('prog-val').innerText = percent + '%';
+            
+            // Desktop bar
+            const bar = document.getElementById('prog-bar');
+            if(bar) bar.style.width = percent + '%';
+            
+            const val = document.getElementById('prog-val');
+            if(val) val.innerText = percent + '%';
+
+            // Mobile bar
+            const mBar = document.getElementById('mobile-global-prog');
+            if(mBar) mBar.style.width = percent + '%';
         }
 
-        function exportData() {
-            const blob = new Blob([JSON.stringify(state)], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = "leihuo_data.json"; a.click();
-            alert("备份成功！请将其上传到 GitHub 同步。");
+        function updatePreview() {
+            const code = document.getElementById('code-input').value;
+            const preview = document.getElementById('code-preview');
+            // 简单的防注入转义
+            preview.textContent = code;
+            if(window.Prism) Prism.highlightElement(preview);
         }
+
+        window.exportData = () => {
+            const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const link = document.createElement('a');
+            link.setAttribute("href", data);
+            link.setAttribute("download", `leihuo_backup_${new Date().toISOString().slice(0,10)}.json`);
+            link.click();
+        };
+
+        // 按 ESC 关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") closeModal();
+        });
 
         init();
     </script>
